@@ -1,0 +1,63 @@
+---
+title: "Regresión Lineal"
+output: html_document
+date: "2023-03-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Ejercicio 2
+```{r}
+y_cuentas <- c("110","2","6","98","40","94","31","5","8","10")
+x_distancia <- c("1.1","100.2","90.3","5.4","57.5","6.6","34.7","65.8","57.9","86.1")
+```
+
+#Ejercico 3
+```{r}
+x_distancia<-as.numeric(x_distancia)
+plot(x_distancia)
+cor.test(x_distancia,y_cuentas)
+cor(x_distancia,y_cuentas)
+
+```
+
+#Ejercicio 4
+```{r}
+hist(x_distancia)
+cvm.test(x_distancia)
+
+```
+
+#Ejercicio 5
+```{r}
+y_cuentas<-as.numeric(y_cuentas)
+xy<-x_distancia*y_cuentas
+xy
+
+```
+
+#Ejercicio 6
+```{r}
+x_cuadrado<-x_distancia^2
+x_cuadrado
+```
+
+#Ejercicio 7
+```{r}
+tabladatos<-data.frame(y_cuentas,x_distancia,xy,x_cuadrado)
+View(tabladatos)
+```
+
+#Ejercicio 8
+```{r}
+kable_styling(kable(tabladatos))
+```
+
+#Ejercicio 9
+```{r}
+rowSums(tabladatos)
+
+```
+
