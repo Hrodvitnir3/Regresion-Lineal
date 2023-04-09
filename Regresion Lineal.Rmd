@@ -1,0 +1,185 @@
+---
+title: "Regresión Lineal"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+date: "2023-04-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Ejercicio 1
+##Para poder instalar un paquete en RStudio, usamos siempre el comando "install.packages".
+
+```{r}
+install.packages("MASS")
+install.packages("caret")
+install.packages("stats")
+install.packages("olsrr")
+install.packages("kable")
+install.packages("kableExtra")
+install.packages("knitr")
+install.packages("rmarkdown")
+```
+
+##Una vez descargados, seleccionamos la pestaña "Packages" en la parte derecha. Buscamos el paquete descargado, y hacemos click en el cuadrado en blanco para instalarlo. 
+
+#Ejercicio 2
+##Para poder crear un vector, primero especificamos el nombre del objeto, tras esto utilizamos "<-" para indicar los valores que contendrá dicho vector. Tras esto, usamos el comando "c()" para especificar los valores que contendrá.
+```{r}
+y_cuentas <- c("110","2","6","98","40","94","31","5","8","10")
+x_distancia <- c("1.1","100.2","90.3","5.4","57.5","6.6","34.7","65.8","57.9","86.1")
+```
+
+#Ejercicio 3
+##Para verificar el supuesto de linealidad de la variable explicativa (X), lo representamos en una gráfica mediante la función "plot()". 
+##Para poder representarlo, primero debemos transformar la varible x en un vector númerico mediante la función "as.numeric()"
+```{r}
+x_distancia<-as.numeric(x_distancia)
+plot(x_distancia)
+```
+##Para crear un contraste de hipótesis, utilizamos la función "cor.test()"
+```{r}
+cor.test(x_distancia,y_cuentas)
+```
+
+#Ejercicio 4
+##Para verificiar el supuesto de normalida de la variable explicativa en un histograma, utilizamos el comando "hist()"
+```{r}
+hist(x_distancia, col = "darkgrey", main  ="Histograma de X")
+```
+
+##Para verificar el test de normalidad, usamos el comando "shapiro.test()"
+```{r}
+shapiro.test(x_distancia)
+```
+
+#Ejercicio 5
+##Para multiplicar dos variables, simplemte usamos el símbolo "*"
+```{r}
+xy<-x_distancia*y_cuentas
+xy
+```
+
+#Ejercicio 6
+##Para elevar una variable al cuadrado, usamos la función "^2"
+```{r}
+x_cuadrado<-x_distancia^2
+x_cuadrado
+```
+
+#Ejercicio 7
+##Para crear un dataframe, usamos la función "data.frame()", y especificamos la variables que va a contener.
+```{r}
+tabla_datos<-data.frame(y_cuentas,x_distancia,xy,x_cuadrado)
+tabla_datos
+```
+
+#Ejercicio 8
+##Una de las funciones que nos proporciona "kableExtra" es la función "kbl()", la cual nos permite visualizar la tabla. 
+```{r}
+kbl(tabla_datos)
+```
+
+#Ejercicio 9
+##Para sumar todas las columnas de dataframe "tabla_datos", usamos la función "colSums()"
+```{r}
+colSums(tabla_datos)
+```
+
+#Ejercicio 10
+##Si la queremos añadir al dataframe anteriormente creado, usamos la función "rbdind()", y especificamos primero el dataframe al que se unirá, y después la que queremos añadir.
+##Para ello, anteriormente tenemos que crear un objeto que sea el sumatorio de las 4 columnas.
+```{r}
+Sumatorio<-colSums(tabla_datos)
+
+rbind(tabla_datos,Sumatorio)
+```
+
+#Ejercicio 11
+##Para calcular la recta de regresión por el método de mínimos cuadrados, debemos realizar varias operaciones.
+##En primer, lugar calculamos el sumatorio de x*y, y lo dividimos entre el número de casos (10 en este caso). 
+```{r}
+404*505.6 #Sumatoriox*y
+```
+```{r}
+204262.4/10 #EntreNumCasos
+```
+##Tras esto, restamos el sumatorio de x + y a este último número
+```{r}
+7041.7-20426.24 #SumatorioXY-Anterior
+```
+##Ahora debemos calcular x al cudrado, y dividirlo entre el número de casos. Posteriormente, le restaremos al sumatorio de x^2 este último número
+```{r}
+505.6^2 #X2
+
+255631.4/10 #EntreNumCasos
+
+37873.66-25563.14 #SumatorioX2-Anterior
+```
+##El último paso es dividir el resultado de ambos pasos
+```{r}
+-13384.54/12310.52
+```
+##El número obtenido (-1.087244) es la recta de regresión
+
+#Ejercicio 12
+##Para visualizar la nube de puntos, primero debemos usar el comando "cor()", especificando las dos variables a relacionar (x,y). Tras esto, usamos el comando "plot()" para visualizarlo gráficamente. 
+##Para crear una recta de regresión, usamos el comando "abline()"
+
+```{r}
+Corr<-cor(x_distancia,y_cuentas)
+plot(x_distancia,y_cuentas, xlab = "Distancia",ylab = "Cuentas") +
+abline(lm(y_cuentas~x_distancia,data = tabladatos)) +
+text(-1.087244,x = 10, y = 65)
+
+
+```
+
+
+#Ejercicio 14
+##Para calcuar la estimación de 6.6km, usamos la ecuación:
+```{r}
+95.37106+6.6*-1.087244
+```
+
+#Ejercicio 15
+##Para crear dos conjuntos aleatorios de números, primero debemos crear una semilla con la función "set.seed()". Tras esto, usamos la función "rnorm()" para asignar un número de valores al nuevo objeto. 
+```{r}
+set.seed(1)
+entrenamiento<-rnorm(10)
+
+set.seed(2)
+validacion<-rnorm(10)
+```
+
+#Ejercicio 16
+##Para ajustar el modelo a estos nuevos valores, primero creamos un dataframe. Tras esto, creamos un objeto llamado "train", del cual elegimos el 80% de los casos anteriores. Creamos entonces un "test" con estos nuevos datos y con esto podemos crear el modelo ajustandolo a los nuevos valores.
+```{r}
+data<-data.frame(y_cuentas, x_distancia)
+train<-data %>% dplyr::sample_frac(.8)
+test<-dplyr::anti_join(data,train)
+
+modelo1 <-lm (y_cuentas~x_distancia, train)
+summary(modelo1)
+```
+
+#Ejercicio 17
+##Los valores de los coeficientes de regresión hacen referencia a la estimación usada en el modelo para predecir el valor de una variable dependiente a partir de otras variable independiente, siendo los astericos el grado de probabilidad azarosa (a más astericos, más probable)
+
+
+##Para el caso de R², nos indican el grado de variación en la variable dependiente, cuyo valor oscila entre 0 y 1 (0 indicaría que no el modelo no explica ninguna variación, y 1 que el modelo explica toda la variación)
+##En este caso, tenemos valores muy cercanos a 0, lo que nos indica que no explica mucha variación.
+
+#Ejercicio 18
+##Los grados de libertad son las observaciones menos los parametros estimados (inteserccion  y pendiente)
+##En regresion lineal simple, se resta 2 (predictor y variable de respuesta) al numero de observaciones
+
+#Ejercicio 19
+```{r}
+summary(modelo1)
+```
+##Explicativa = 0.87
+##No Explicativa = 18.24
